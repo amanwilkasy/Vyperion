@@ -12,13 +12,13 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfiguration {
 
-    @Value("${PROFILE}")
+    @Value("${PROFILE_VALUE}")
     private String profile;
 
-    @Value("${PROD_DB}")
+    @Value("${PROD_DB_VALUE}")
     private String prodDB;
 
-    @Value("${DEV_DB}")
+    @Value("${DEV_DB_VALUE}")
     private String devDB;
 
 

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "apiKey",
+    "id": 0,
+    "keyName": null,
+    "keyValue": null
+  },
+  {
+    "type": "clientApiKey",
+    "id": 0,
+    "keyName": null,
+    "keyValue": null,
+    "userId": null
+  },
+  {
+    "type": "signInUser",
+    "email": null,
+    "password": null
+  },
+  {
+    "type": "signUpUser",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "password": null
+  }
+]

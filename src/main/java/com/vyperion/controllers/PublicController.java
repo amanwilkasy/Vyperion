@@ -35,7 +35,7 @@ public class PublicController {
 
     @PostMapping("signup")
     public ResponseEntity<String> signUpUser(@Valid @RequestBody BaseUser signUpUser) {
-//        userService.addUser(userService.signUpUserToUser(signUpUser));
+        userService.addUser(userService.signUpUserToUser(signUpUser));
         return ResponseEntity.ok("Signed Up ".concat(signUpUser.getFirstName()));
 
     }
@@ -45,20 +45,6 @@ public class PublicController {
     public ResponseEntity<ResponseWrapper> some() {
         return ResponseEntity.ok().body(new ResponseWrapper(new ClientUser()));
     }
-
-//    @PostMapping("test")
-//    public String test(@Valid @RequestBody BaseUser signInUser) throws IOException {
-//        System.out.println(signInUser);
-////        BaseUser impl1 = new SignUpUser();
-////        BaseUser impl2 = new SignInUser();
-////        BaseApiKey some1 = new ApiKey();
-////        BaseApiKey some2 = new ClientApiKey();
-////        new ObjectMapper().writeValue(new File("src/main/java/com/example/demo/dto/client/SignUpUser.txt"), impl1);
-////        new ObjectMapper().writeValue(new File("src/main/java/com/example/demo/dto/client/SignInUser.txt"), impl2);
-////        new ObjectMapper().writeValue(new File("src/main/java/com/example/demo/dto/client/ApiKey.txt"), some1);
-////        new ObjectMapper().writeValue(new File("src/main/java/com/example/demo/dto/client/ClientApiKey.txt"), some2);
-//        return "hit";
-//    }
 
 }
 

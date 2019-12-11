@@ -1,0 +1,4 @@
+clear up exceptions
+figure out better exception handling
+generify data in and data out
+delete unused code

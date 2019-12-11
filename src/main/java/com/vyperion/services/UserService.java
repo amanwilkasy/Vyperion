@@ -1,9 +1,10 @@
 package com.vyperion.services;
 
 
+import com.vyperion.dto.BaseUser;
 import com.vyperion.dto.DefaultRoles;
 import com.vyperion.dto.User;
-import com.vyperion.dto.client.SignUpUser;
+import com.vyperion.exceptions.UserNotFoundException;
 import com.vyperion.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signUpUserToUser(SignUpUser signupUser) {
+    public User signUpUserToUser(BaseUser signupUser) {
         User user = new User();
         user.setFirstName(signupUser.getFirstName());
         user.setLastName(signupUser.getLastName());
@@ -35,21 +36,21 @@ public class UserService {
         return user;
     }
 
-    Optional<User> getUserById(String id) {
-        return userRepository.findById(id);
+    User getUserById(String id) {
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
-    Optional<User> getUserByEmail(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email));
+    User getUserByEmail(String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email)).orElseThrow(UserNotFoundException::new);
     }
 
-    public void addUser(User user){
+    public void addUser(User user) {
         userRepository.saveAndFlush(encryptPassword(user));
     }
 
-    private User encryptPassword(User user){
-         user.setPassword(passwordEncoder.encode(user.getPassword()));
-         return user;
+    private User encryptPassword(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return user;
     }
 
 }

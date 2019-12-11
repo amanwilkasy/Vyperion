@@ -2,6 +2,7 @@ package com.vyperion.services;
 
 import com.vyperion.dto.ApiSecret;
 import com.vyperion.dto.User;
+import com.vyperion.exceptions.SecretNotFoundException;
 import com.vyperion.repositories.ApiSecretRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,33 +21,35 @@ public class ApiSecretService {
         this.userService = userService;
     }
 
-    public Optional<ApiSecret> findApiSecretByUserId(String userId) {
-        return Optional.ofNullable(apiSecretRepository.findApiSecretByUserId(userId));
+    public ApiSecret findApiSecretByUserId(String userId) {
+        return Optional.ofNullable(apiSecretRepository.findApiSecretByUserId(userId)).orElseThrow(SecretNotFoundException::new);
     }
 
-    public Optional<ApiSecret> regenerateApiSecret(String userId){
-        Optional<ApiSecret> apiSecret = findApiSecretByUserId(userId);
-        if (apiSecret.isPresent()){
-            apiSecret.get().setSecret(UUID.randomUUID().toString());
-            apiSecretRepository.save(apiSecret.get());
-            return apiSecret;
+    public ApiSecret regenerateApiSecret(String userId) {
+        try {
+            ApiSecret apiSecret = findApiSecretByUserId(userId);
+            apiSecret.setSecret(UUID.randomUUID().toString());
+            return apiSecretRepository.save(apiSecret);
+        } catch (SecretNotFoundException e) {
+            return generateApiSecret(userId);
         }
-        return generateApiSecret(userId);
     }
 
-    public Optional<ApiSecret> generateApiSecret(String userId){
-        Optional<ApiSecret> apiSecret = findApiSecretByUserId(userId);
-        if (apiSecret.isPresent()){
-            return apiSecret;
+    public ApiSecret generateApiSecret(String userId) {
+        try {
+            return findApiSecretByUserId(userId);
+        } catch (SecretNotFoundException e) {
+            User user = userService.getUserById(userId);
+            ApiSecret apiSecret = new ApiSecret();
+            apiSecret.setSecret(UUID.randomUUID().toString());
+            apiSecret.setUser(user);
+            return apiSecretRepository.save(apiSecret);
         }
-        Optional<User> user = userService.getUserById(userId);
-        if (user.isPresent()){
-            apiSecret = Optional.of(new ApiSecret());
-            apiSecret.get().setSecret(UUID.randomUUID().toString());
-            apiSecret.get().setUser(user.get());
-            apiSecretRepository.save(apiSecret.get());
-            return apiSecret;
-        }
-        throw new RuntimeException("User not found");
     }
 }
+
+
+
+
+
+

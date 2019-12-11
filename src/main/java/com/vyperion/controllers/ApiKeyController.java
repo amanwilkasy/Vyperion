@@ -1,12 +1,9 @@
 package com.vyperion.controllers;
 
-import com.vyperion.config.jwt.TokenNotifier;
+import com.vyperion.config.jwt.JWTFilter;
 import com.vyperion.dto.ApiKey;
 import com.vyperion.dto.BaseApiKey;
-import com.vyperion.dto.client.ClientApiKey;
 import com.vyperion.dto.client.ClientUser;
-import com.vyperion.exceptions.ApiKeyNotFoundException;
-import com.vyperion.exceptions.CrossUserException;
 import com.vyperion.services.ApiKeyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,64 +11,45 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("apikey")
-public class ApiKeyController implements TokenListener {
-
+public class ApiKeyController {
+    private final JWTFilter jwtFilter;
     private final ApiKeyService apiKeyService;
-    private ClientUser clientUser;
 
-    public ApiKeyController(ApiKeyService apiKeyService, TokenNotifier jwtFilter) {
+    public ApiKeyController(ApiKeyService apiKeyService, JWTFilter jwtFilter) {
         this.apiKeyService = apiKeyService;
-        jwtFilter.registerObserver(this);
+        this.jwtFilter = jwtFilter;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<List<ApiKey>> getApiKeysByUserId(@PathVariable String id) {
-        assertUserRequest(id);
-        Optional<List<ApiKey>> apiKeys = apiKeyService.getApiKeysByUserId(id);
-        if (apiKeys.isPresent()) {
-            return ResponseEntity.ok().body(apiKeys.get());
-        }
-        throw new ApiKeyNotFoundException("Id of user is not correct");
+    @GetMapping
+    public ResponseEntity<List<ApiKey>> getApiKeysByUserId() {
+        return ResponseEntity.ok().body(apiKeyService.getApiKeysByUserId(getClientUser().getId()));
+
     }
 
     @PostMapping
     public ResponseEntity<String> addApiKey(@Valid @RequestBody BaseApiKey apiKey) {
-        assertUserRequest(((ClientApiKey) apiKey).getUserId());
-        apiKeyService.addApiKey(apiKeyService.clientApiKeyToApiKey(apiKey));
+        apiKeyService.addApiKey(apiKeyService.clientApiKeyToApiKey(apiKey, getClientUser().getId()));
         return ResponseEntity.ok("Added ApiKey ".concat(apiKey.getKeyName()));
     }
 
     @PutMapping
     public ResponseEntity<String> updateApiKey(@Valid @RequestBody BaseApiKey apiKey) {
-        assertUserRequest(((ClientApiKey) apiKey).getUserId());
-        apiKeyService.updateApiKey(apiKeyService.clientApiKeyToApiKey(apiKey));
+        apiKeyService.updateApiKey(apiKeyService.clientApiKeyToApiKey(apiKey, getClientUser().getId()));
         return ResponseEntity.ok("Updated ApiKey ".concat(apiKey.getKeyName()));
     }
 
 
-    @DeleteMapping("{userId}/{apiKeyId}")
-    public ResponseEntity<String> deleteApiKey(@PathVariable String userId, @PathVariable String apiKeyId) {
-        assertUserRequest(userId);
-        apiKeyService.deleteApiKey(userId, apiKeyId);
+    @DeleteMapping("{apiKeyId}")
+    public ResponseEntity<String> deleteApiKey(@PathVariable String apiKeyId) {
+        apiKeyService.deleteApiKey(getClientUser().getId(), apiKeyId);
         return ResponseEntity.ok("Deleted ApiKey");
     }
 
-    private void assertUserRequest(String id){
-        if (!this.clientUser.getId().equals(id)){
-            log.error("User request is not for himself");
-            throw new CrossUserException("User request is not for himself");
-        }
+    private ClientUser getClientUser() {
+        return jwtFilter.getClientUser();
     }
-
-    @Override
-    public void update(ClientUser clientUser) {
-        this.clientUser = clientUser;
-    }
-
-
 }

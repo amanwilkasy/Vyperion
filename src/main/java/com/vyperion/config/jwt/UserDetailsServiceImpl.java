@@ -1,11 +1,13 @@
 package com.vyperion.config.jwt;
 
-import com.vyperion.dto.User;
+import com.vyperion.exceptions.UserNotFoundException;
 import com.vyperion.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,11 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        final User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("User Email '" + email + "' not found");
-        }
-        return user;
+        return Optional.ofNullable(userRepository.findByEmail(email)).orElseThrow(UserNotFoundException::new);
     }
 
 }

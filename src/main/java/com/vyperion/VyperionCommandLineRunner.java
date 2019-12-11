@@ -38,8 +38,8 @@ class VyperionCommandLineRunner implements CommandLineRunner {
             User user = new User();
             user.setFirstName("some");
             user.setLastName("guy");
-            user.setEmail("email");
-            user.setPassword(passwordEncoder.encode("pass"));
+            user.setEmail("me@email.com");
+            user.setPassword(passwordEncoder.encode("asdfasdf"));
             user.setRoles(DefaultRoles.USER_ROLE);
 
             ApiKey apiKey = new ApiKey();
@@ -48,7 +48,7 @@ class VyperionCommandLineRunner implements CommandLineRunner {
             apiKey.setUser(user);
 
             ApiSecret apiSecret = new ApiSecret();
-            apiSecret.setSecret("my secret");
+            apiSecret.setSecret("mygeneratedsecret");
             apiSecret.setUser(user);
 
             List<ApiKey> apiKeys = new ArrayList<>();

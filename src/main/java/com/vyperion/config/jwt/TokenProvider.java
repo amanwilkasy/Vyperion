@@ -51,7 +51,7 @@ public class TokenProvider {
         return Jwts.parser().setSigningKey(JwtProperties.SECRET).parseClaimsJws(token).getBody().getSubject();
     }
 
-    ClientUser getClientUserFromToken(String token) {
+    public ClientUser getClientUserFromToken(String token) {
         LinkedHashMap userClaims = Jwts.parser().setSigningKey(JwtProperties.SECRET)
                 .parseClaimsJws(token).getBody()
                 .get("user", LinkedHashMap.class);

@@ -16,7 +16,6 @@ import java.util.Set;
         @JsonSubTypes.Type(value = SignInUser.class, name = "signInUser")}
 )
 public abstract class BaseUser {
-//    private String email = "some";
 
     private String id;
 
@@ -29,10 +28,5 @@ public abstract class BaseUser {
     private String password;
 
     private Set<String> roles;
-
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@JsonDeserialize(as = BaseImpl.class)
-//@JsonIgnoreProperties(ignoreUnknown = true)
 
 }

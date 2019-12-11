@@ -1,6 +1,8 @@
 package com.vyperion.config.jwt;
 
-import com.vyperion.controllers.TokenListener;
+import com.vyperion.dto.client.ClientUser;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,17 +15,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 //https://stackoverflow.com/questions/13152946/what-is-onceperrequestfilter
 @Slf4j
+@Data
 @Component
-public class JWTFilter extends OncePerRequestFilter implements TokenNotifier {
+@EqualsAndHashCode(callSuper = false)
+public class JWTFilter extends OncePerRequestFilter{
 
     private TokenProvider tokenProvider;
     private String token;
-    private List<TokenListener> tokenListeners = new ArrayList<>();
 
     public JWTFilter(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
@@ -31,43 +33,37 @@ public class JWTFilter extends OncePerRequestFilter implements TokenNotifier {
 
     @Override
     protected void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
-        token = resolveToken(servletRequest);
-        if (token != null && tokenProvider.validateToken(token)) {
-            notifyObserver();
-            Authentication auth = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
+        resolveToken(servletRequest).ifPresent(token -> {
+            if (tokenProvider.validateToken(token)) {
+                this.token = token;
+                Authentication auth = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        });
+
+//        if (resolveToken(servletRequest).isPresent() && tokenProvider.validateToken(token)) {
+//            notifyObserver();
+//            Authentication auth = tokenProvider.getAuthentication(token);
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+//        }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
 
-    private String resolveToken(HttpServletRequest request){
+    public ClientUser getClientUser() {
+        return tokenProvider.getClientUserFromToken(token);
+    }
+
+
+    public Optional<String> resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(JwtProperties.AUTHORIZATION);
+        Optional<String> token = Optional.empty();
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(JwtProperties.BEARER)) {
-            return bearerToken.substring(7);
+            token = Optional.of(bearerToken.substring(7));
         }
-        return null;
+        return token;
     }
 
-
-    @Override
-    public void registerObserver(TokenListener tokenListener) {
-        tokenListeners.add(tokenListener);
-    }
-
-    @Override
-    public void removeObserver(TokenListener tokenListener) {
-        int i = tokenListeners.indexOf(tokenListener);
-        if (i >= 0){
-            tokenListeners.remove(i);
-        }
-    }
-
-    @Override
-    public void notifyObserver() {
-        for (TokenListener tokenListener : tokenListeners) {
-            tokenListener.update(tokenProvider.getClientUserFromToken(token));
-        }
-    }
 }
 

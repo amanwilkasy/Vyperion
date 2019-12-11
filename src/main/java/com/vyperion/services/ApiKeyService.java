@@ -3,7 +3,6 @@ package com.vyperion.services;
 import com.vyperion.dto.ApiKey;
 import com.vyperion.dto.BaseApiKey;
 import com.vyperion.dto.User;
-import com.vyperion.dto.client.ClientApiKey;
 import com.vyperion.exceptions.ApiKeyNotFoundException;
 import com.vyperion.repositories.ApiKeyRepository;
 import org.springframework.stereotype.Service;
@@ -23,79 +22,41 @@ public class ApiKeyService {
         this.userService = userService;
     }
 
-    public Optional<List<ApiKey>> getApiKeysByUserId(String id) {
-        return Optional.ofNullable(apiKeyRepository.findAllByUserId(id));
+    public List<ApiKey> getApiKeysByUserId(String id) {
+        return Optional.ofNullable(apiKeyRepository.findAllByUserId(id)).orElseThrow(ApiKeyNotFoundException::new);
     }
 
-    private Optional<ApiKey> getApiKeyById(int id) {
-        return apiKeyRepository.findById(id);
+    private ApiKey getApiKeyById(int id) {
+        return apiKeyRepository.findById(id).orElseThrow(ApiKeyNotFoundException::new);
     }
 
     public void addApiKey(ApiKey apiKey) {
-        try {
-            apiKeyRepository.saveAndFlush(apiKey);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        apiKeyRepository.saveAndFlush(apiKey);
     }
 
     public void updateApiKey(ApiKey apiKey) {
-        Optional<ApiKey> stored = getApiKeyById(apiKey.getId());
-        if (stored.isEmpty()) {
-            throw new ApiKeyNotFoundException("Could not update Api Key");
-        }
-        stored.get().setKeyName(apiKey.getKeyName());
-        stored.get().setKeyValue(apiKey.getKeyValue());
-        try {
-            addApiKey(stored.get());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ApiKey stored = getApiKeyById(apiKey.getId());
+        stored.setKeyName(apiKey.getKeyName());
+        stored.setKeyValue(apiKey.getKeyValue());
+        addApiKey(stored);
     }
 
     private Optional<ApiKey> apiKeyBelongsToUser(String userId, String apiKeyId) {
-        Optional<List<ApiKey>> userApiKeys = getApiKeysByUserId(userId);
-        Optional<ApiKey> apiKey = Optional.empty();
-        if (userApiKeys.isPresent()) {
-            apiKey = userApiKeys.get().stream().filter(key -> key.getId() == Integer.parseInt(apiKeyId))
-                    .findFirst().map(Optional::of)
-                    .orElse(apiKey);
-        }
-        return apiKey;
+        List<ApiKey> userApiKeys = getApiKeysByUserId(userId);
+        return userApiKeys.stream().filter(key -> key.getId() == Integer.parseInt(apiKeyId))
+                .findFirst().map(Optional::of).orElseThrow(ApiKeyNotFoundException::new);
     }
 
 
     public void deleteApiKey(String userId, String apiKeyId) {
         Optional<ApiKey> apiKey = apiKeyBelongsToUser(userId, apiKeyId);
-        if (apiKey.isEmpty()) {
-            throw new ApiKeyNotFoundException("Could not delete id that does not exist");
-        }
-        try {
-            apiKeyRepository.delete(apiKey.get());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        apiKeyRepository.delete(apiKey.orElseThrow(ApiKeyNotFoundException::new));
     }
 
-    public ApiKey clientApiKeyToApiKey(BaseApiKey baseApiKey) {
-        Optional<User> user = userService.getUserById(((ClientApiKey) baseApiKey).getUserId());
-        if (user.isEmpty()) {
-            throw new RuntimeException("User Id not found");
-        }
-        ApiKey normalizedApiKey = new ApiKey();
-        try {
-            normalizedApiKey.setId(baseApiKey.getId());
-            normalizedApiKey.setKeyName(baseApiKey.getKeyName());
-            normalizedApiKey.setKeyValue(baseApiKey.getKeyValue());
-            normalizedApiKey.setUser(user.get());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return normalizedApiKey;
+    public ApiKey clientApiKeyToApiKey(BaseApiKey baseApiKey, String userId) {
+        User user = userService.getUserById(userId);
+        return new ApiKey(baseApiKey.getId(), baseApiKey.getKeyName(),
+                baseApiKey.getKeyValue(), user);
     }
-
-//    public ApiKey getApiKeyByName(String id, String keyName) {
-//        return apiKeyRepository.findApiKeyByUserIdAndKeyName(id, keyName);
-//    }
 
 }

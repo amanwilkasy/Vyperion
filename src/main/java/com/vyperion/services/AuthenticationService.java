@@ -1,16 +1,14 @@
 package com.vyperion.services;
 
+import com.vyperion.config.jwt.Token;
 import com.vyperion.config.jwt.TokenProvider;
-import com.vyperion.dto.client.SignInUser;
+import com.vyperion.dto.BaseUser;
 import com.vyperion.dto.User;
+import com.vyperion.exceptions.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -27,17 +25,13 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public String signIn(SignInUser signInUser) {
+    public Token signIn(BaseUser signInUser) {
         try {
-            Optional<User> user = userService.getUserByEmail(signInUser.getEmail());
-            if (user.isPresent()) {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInUser.getEmail(), signInUser.getPassword()));
-                return tokenProvider.createToken(user.get());
-            }
-            throw new UsernameNotFoundException("User Email '" + signInUser.getEmail() + "' not found");
-
+            User user = userService.getUserByEmail(signInUser.getEmail());
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInUser.getEmail(), signInUser.getPassword()));
+            return new Token(tokenProvider.createToken(user));
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username/password supplied");
+            throw new BadCredentialsException(e.getMessage());
         }
     }
 }

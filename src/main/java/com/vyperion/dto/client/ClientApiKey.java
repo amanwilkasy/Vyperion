@@ -15,5 +15,5 @@ public class ClientApiKey extends BaseApiKey {
 
     private String keyValue;
 
-    private String userId;
+//    private String userId;
 }

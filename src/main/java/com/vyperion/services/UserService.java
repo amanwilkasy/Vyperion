@@ -45,14 +45,8 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        userRepository.saveAndFlush(encryptPassword(user));
+        userRepository.saveAndFlush(user);
     }
-
-    private User encryptPassword(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return user;
-    }
-
 }
 
 

@@ -5,11 +5,13 @@ import com.vyperion.config.jwt.TokenProvider;
 import com.vyperion.dto.BaseUser;
 import com.vyperion.dto.User;
 import com.vyperion.exceptions.BadCredentialsException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthenticationService {
 

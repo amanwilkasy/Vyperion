@@ -45,11 +45,11 @@ class VyperionCommandLineRunner implements CommandLineRunner {
             ApiKey apiKey = new ApiKey();
             apiKey.setKeyValue("value");
             apiKey.setKeyName("name");
-            apiKey.setUser(user);
+            apiKey.setUserId(user);
 
             ApiSecret apiSecret = new ApiSecret();
             apiSecret.setSecret("mygeneratedsecret");
-            apiSecret.setUser(user);
+            apiSecret.setUserId(user);
 
             List<ApiKey> apiKeys = new ArrayList<>();
             apiKeys.add(apiKey);

@@ -31,7 +31,7 @@ public class ApiKey extends BaseApiKey{
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="user", referencedColumnName = "id" ,nullable=false)
-    private User user;
+    @JoinColumn(name="userId", referencedColumnName = "id" ,nullable=false)
+    private User userId;
 
 }

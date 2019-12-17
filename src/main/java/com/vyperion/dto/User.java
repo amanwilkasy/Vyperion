@@ -46,11 +46,11 @@ public class User implements UserDetails {
     private Set<String> roles = new HashSet<>();
 
     @JsonManagedReference
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "userId", cascade = CascadeType.ALL)
     private ApiSecret apiSecret;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
     private List<ApiKey> apiKeys;
 
     @Override

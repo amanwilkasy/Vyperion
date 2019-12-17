@@ -42,7 +42,7 @@ public class ApiSecretService {
             User user = userService.getUserById(userId);
             ApiSecret apiSecret = new ApiSecret();
             apiSecret.setSecret(UUID.randomUUID().toString());
-            apiSecret.setUser(user);
+            apiSecret.setUserId(user);
             return apiSecretRepository.save(apiSecret);
         }
     }

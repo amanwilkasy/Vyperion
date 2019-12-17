@@ -21,8 +21,8 @@ public class ApiSecret {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JsonBackReference
-    @JoinColumn(name = "user", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private User userId;
 
     @Column(name = "secret", unique = true, nullable = false)
     private String secret;

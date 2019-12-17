@@ -26,12 +26,12 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signUpUserToUser(BaseUser signupUser) {
+    public User signUpUserToUser(BaseUser signUpUser) {
         User user = new User();
-        user.setFirstName(signupUser.getFirstName());
-        user.setLastName(signupUser.getLastName());
-        user.setEmail(signupUser.getEmail());
-        user.setPassword(passwordEncoder.encode(signupUser.getPassword()));
+        user.setFirstName(signUpUser.getFirstName());
+        user.setLastName(signUpUser.getLastName());
+        user.setEmail(signUpUser.getEmail());
+        user.setPassword(passwordEncoder.encode(signUpUser.getPassword()));
         user.setRoles(DefaultRoles.USER_ROLE);
         return user;
     }
@@ -45,12 +45,7 @@ public class UserService {
     }
 
     public void addUser(User user) {
-        userRepository.saveAndFlush(encryptPassword(user));
-    }
-
-    private User encryptPassword(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return user;
+        userRepository.saveAndFlush(user);
     }
 
 }

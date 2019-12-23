@@ -27,7 +27,7 @@ public class CustomCorsConfiguration implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://www.vyperion.com", "https://vyperion.herokuapp.com"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://www.vyperion.com", "https://vyperion.herokuapp.com", "https://vyperion-client.herokuapp.com"));
         config.setAllowedMethods(Arrays.asList("POST", "OPTIONS", "GET", "DELETE", "PUT"));
         config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
         source.registerCorsConfiguration("/**", config);

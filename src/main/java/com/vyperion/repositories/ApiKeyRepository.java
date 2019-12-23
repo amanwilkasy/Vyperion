@@ -9,7 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ApiKeyRepository extends JpaRepository<ApiKey, Integer> {
-
     List<ApiKey> findAllByUserId(User userId);
-
 }

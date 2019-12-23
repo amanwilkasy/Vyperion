@@ -1,8 +1,9 @@
 package com.vyperion;
 
+import com.vyperion.config.DatabaseConfiguration;
 import com.vyperion.dto.ApiKey;
 import com.vyperion.dto.ApiSecret;
-import com.vyperion.dto.DefaultRoles;
+import com.vyperion.config.DefaultRoles;
 import com.vyperion.dto.User;
 import com.vyperion.repositories.ApiKeyRepository;
 import com.vyperion.repositories.ApiSecretRepository;
@@ -26,11 +27,15 @@ class VyperionCommandLineRunner implements CommandLineRunner {
     private ApiKeyRepository apiKeyRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private DatabaseConfiguration databaseConfiguration;
 
     @Override
     public void run(String... args) {
 
-        if (false) {
+        boolean prodEnv = databaseConfiguration.isProdEnv();
+
+        if (!prodEnv && userRepository.findByEmail("me@email.com") == null) {
             apiSecretRepository.deleteAll();
             apiKeyRepository.deleteAll();
             userRepository.deleteAll();

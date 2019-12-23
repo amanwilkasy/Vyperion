@@ -22,7 +22,8 @@ public class ApiSecretService {
     }
 
     public ApiSecret findApiSecretByUserId(String userId) {
-        return Optional.ofNullable(apiSecretRepository.findApiSecretByUserId(userId)).orElseThrow(SecretNotFoundException::new);
+        User user = userService.getUserById(userId);
+        return Optional.ofNullable(apiSecretRepository.findApiSecretByUserId(user)).orElseThrow(SecretNotFoundException::new);
     }
 
     public ApiSecret regenerateApiSecret(String userId) {

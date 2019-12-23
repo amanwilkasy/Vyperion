@@ -23,7 +23,8 @@ public class ApiKeyService {
     }
 
     public List<ApiKey> getApiKeysByUserId(String id) {
-        return Optional.ofNullable(apiKeyRepository.findAllByUserId(id)).orElseThrow(ApiKeyNotFoundException::new);
+        User user = userService.getUserById(id);
+        return Optional.ofNullable(apiKeyRepository.findAllByUserId(user)).orElseThrow(ApiKeyNotFoundException::new);
     }
 
     private ApiKey getApiKeyById(int id) {

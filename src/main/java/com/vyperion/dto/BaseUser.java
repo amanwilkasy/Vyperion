@@ -9,12 +9,8 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
-        property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SignUpUser.class, name = "signUpUser"),
-        @JsonSubTypes.Type(value = SignInUser.class, name = "signInUser")}
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(value = SignUpUser.class, name = "signUpUser"), @JsonSubTypes.Type(value = SignInUser.class, name = "signInUser")})
 public abstract class BaseUser {
 
     private String id;

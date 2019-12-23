@@ -21,10 +21,13 @@ public class DatabaseConfiguration {
     @Value("${DEV_DB_VALUE}")
     private String devDB;
 
+    public boolean isProdEnv(){
+        return profile.contains(EnvironmentVariables.PRODUCTION.VALUE);
+    }
 
     @Bean
     public DataSource getDataSource() {
-        return profile.contains(EnvironmentVariables.PRODUCTION.VALUE) ? prodDb() : devDb();
+        return isProdEnv() ? prodDb() : devDb();
     }
 
     private DataSource prodDb() {

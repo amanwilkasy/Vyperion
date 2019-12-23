@@ -2,7 +2,7 @@ package com.vyperion.services;
 
 
 import com.vyperion.dto.BaseUser;
-import com.vyperion.dto.DefaultRoles;
+import com.vyperion.config.DefaultRoles;
 import com.vyperion.dto.User;
 import com.vyperion.exceptions.UserNotFoundException;
 import com.vyperion.repositories.UserRepository;
@@ -47,7 +47,6 @@ public class UserService {
     public void addUser(User user) {
         userRepository.saveAndFlush(user);
     }
-
 }
 
 
